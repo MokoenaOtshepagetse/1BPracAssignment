@@ -1,0 +1,243 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Main {
+    // ArrayList to store all Series objects. It acts as our in-memory database.
+    private static ArrayList<Series> seriesList = new ArrayList<>();
+    // Scanner object to read user input from the console.
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        boolean exit = false;
+        // Main program loop. It continues to run until the 'exit' variable is true.
+        while (!exit) {
+            System.out.println("----------------------------------------");
+            System.out.println("Enter '1' to open the menu or any other key to exit.");
+            System.out.println("----------------------------------------");
+            String input = scanner.nextLine();
+
+            // Check user input to decide whether to show the menu or exit.
+            if (input.equals("1")) {
+                showMenu();
+            } else {
+                // Call the exit method if the user chooses not to enter the menu.
+                exit = exitSeriesApplication();
+            }
+        }
+        // Close the scanner to prevent resource leaks when the program terminates.
+        scanner.close();
+    }
+
+    // Method to display the main menu and handle user choice.
+    public static void showMenu() {
+        System.out.println("\n--- Store Management Menu ---");
+        System.out.println("1. Capture a new series");
+        System.out.println("2. Search for a series");
+        System.out.println("3. Update series age restriction");
+        System.out.println("4. Delete a series");
+        System.out.println("5. Print series report - 2025");
+        System.out.println("6. Exit Application");
+        System.out.print("Enter your choice: ");
+
+        String choice = scanner.nextLine();
+
+        // Use a switch statement to perform an action based on the user's choice.
+        switch (choice) {
+            case "1":
+                captureNewSeries();
+                break;
+            case "2":
+                searchForSeries();
+                break;
+            case "3":
+                updateSeriesAgeRestriction();
+                break;
+            case "4":
+                deleteSeries();
+                break;
+            case "5":
+                printSeriesReport();
+                break;
+            case "6":
+                // Option 6 simply returns to the main prompt.
+                System.out.println("Returning to main prompt.");
+                break;
+            default:
+                // Handle invalid input.
+                System.out.println("Invalid choice. Please enter a number between 1 and 6.");
+                break;
+        }
+    }
+    
+    // Method to capture and store a new series from user input.
+    private static void captureNewSeries() {
+        System.out.println("\n--- Capture a New Series ---");
+        System.out.print("Enter Series ID: ");
+        String id = scanner.nextLine();
+
+        System.out.print("Enter Series Name: ");
+        String name = scanner.nextLine();
+
+        String age;
+        // Loop to ensure a valid age is entered.
+        while (true) {
+            System.out.print("Enter Age Restriction (2-18): ");
+            age = scanner.nextLine();
+            try {
+                int ageInt = Integer.parseInt(age);
+                // Validate if the age is within the specified range.
+                if (ageInt >= 2 && ageInt <= 18) {
+                    break; 
+                } else {
+                    System.out.println("Error: Age restriction must be between 2 and 18.");
+                }
+            } catch (NumberFormatException e) {
+                // Handle non-numeric input for age.
+                System.out.println("Error: Invalid input. Please enter a number for age restriction.");
+            }
+        }
+
+        System.out.print("Enter Number of Episodes: ");
+        String episodes = scanner.nextLine();
+
+        // Create a new Series object and add it to the seriesList.
+        Series newSeries = new Series(id, name, age, episodes);
+        seriesList.add(newSeries);
+        System.out.println("\nSeries successfully captured!");
+        System.out.println(newSeries);
+    }
+    
+    // Method to search for a series by its ID.
+    private static void searchForSeries() {
+        System.out.println("\n--- Search for a Series ---");
+        System.out.print("Enter Series ID to search: ");
+        String searchId = scanner.nextLine();
+
+        boolean found = false;
+        // Loop through the list to find the matching series.
+        for (Series series : seriesList) {
+            // Use equalsIgnoreCase for case-insensitive matching.
+            if (series.getSeriesId().equalsIgnoreCase(searchId)) {
+                System.out.println("\nSeries found! Details:");
+                System.out.println(series);
+                found = true;
+                break; // Exit the loop once the series is found.
+            }
+        }
+
+        // If the series was not found after checking the entire list.
+        if (!found) {
+            System.out.println("Error: Series with ID '" + searchId + "' could not be found.");
+        }
+    }
+
+    // Method to update the details of an existing series.
+    private static void updateSeriesAgeRestriction() {
+        System.out.println("\n--- Update Series Age Restriction ---");
+        System.out.print("Enter Series ID to update: ");
+        String updateId = scanner.nextLine();
+
+        Series seriesToUpdate = null;
+        // Find the series by its ID.
+        for (Series series : seriesList) {
+            if (series.getSeriesId().equalsIgnoreCase(updateId)) {
+                seriesToUpdate = series;
+                break;
+            }
+        }
+
+        if (seriesToUpdate != null) {
+            System.out.println("\nSeries found! Current details:");
+            System.out.println(seriesToUpdate);
+
+            // Prompt for new values and update the series object.
+            System.out.print("\nEnter new Series Name: ");
+            String newName = scanner.nextLine();
+            seriesToUpdate.setSeriesName(newName);
+
+            String newAge;
+            while (true) {
+                System.out.print("Enter new Age Restriction (2-18): ");
+                newAge = scanner.nextLine();
+                try {
+                    int ageInt = Integer.parseInt(newAge);
+                    if (ageInt >= 2 && ageInt <= 18) {
+                        seriesToUpdate.setSeriesAge(newAge);
+                        break;
+                    } else {
+                        System.out.println("Error: Age restriction must be between 2 and 18.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Error: Invalid input. Please enter a number for age restriction.");
+                }
+            }
+            
+            System.out.print("Enter new Number of Episodes: ");
+            String newEpisodes = scanner.nextLine();
+            seriesToUpdate.setSeriesNumberOfEpisodes(newEpisodes);
+
+            System.out.println("\nSeries details successfully updated!");
+            System.out.println(seriesToUpdate);
+        } else {
+            System.out.println("Error: Series with ID '" + updateId + "' could not be found.");
+        }
+    }
+
+    // Method to delete a series after confirming with the user.
+    private static void deleteSeries() {
+        System.out.println("\n--- Delete a Series ---");
+        Series seriesToDelete = null;
+        String deleteId;
+
+        // Loop to re-prompt if the user enters an invalid ID.
+        while (seriesToDelete == null) {
+            System.out.print("Enter Series ID to delete: ");
+            deleteId = scanner.nextLine();
+
+            for (Series series : seriesList) {
+                if (series.getSeriesId().equalsIgnoreCase(deleteId)) {
+                    seriesToDelete = series;
+                    break;
+                }
+            }
+
+            if (seriesToDelete == null) {
+                System.out.println("Error: Series with ID '" + deleteId + "' could not be found. Please try again.");
+            }
+        }
+
+        // Ask for confirmation before deleting.
+        System.out.println("\nSeries found! Are you sure you want to delete this series?");
+        System.out.println(seriesToDelete);
+        System.out.print("\nConfirm deletion (y/n): ");
+        String confirmation = scanner.nextLine();
+
+        // Check for 'y' for deletion confirmation.
+        if (confirmation.equalsIgnoreCase("y")) {
+            seriesList.remove(seriesToDelete);
+            System.out.println("\nSeries successfully deleted!");
+        } else {
+            System.out.println("\nDeletion cancelled.");
+        }
+    }
+
+    // Method to print a report of all stored series.
+    private static void printSeriesReport() {
+        System.out.println("\n--- Series Report (2025) ---");
+        if (seriesList.isEmpty()) {
+            System.out.println("No series stored.");
+        } else {
+            // Iterate through the list and print each series' details.
+            for (int i = 0; i < seriesList.size(); i++) {
+                System.out.println("\n--- Series #" + (i + 1) + " ---");
+                System.out.println(seriesList.get(i));
+            }
+        }
+    }
+    
+    // Method to handle the application exit.
+    public static boolean exitSeriesApplication() {
+        System.out.println("Exiting application. Goodbye!");
+        return true;
+    }
+}

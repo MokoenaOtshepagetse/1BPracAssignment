@@ -1,0 +1,62 @@
+public class Series {
+    // Private instance variables to store series information.
+    // 'private' ensures that these variables can only be accessed within this class.
+    private String seriesId;
+    private String seriesName;
+    private String seriesAge;
+    private String seriesNumberOfEpisodes;
+
+    // Constructor to initialize a new Series object.
+    // It takes values for all the instance variables as parameters.
+    public Series(String seriesId, String seriesName, String seriesAge, String seriesNumberOfEpisodes) {
+        this.seriesId = seriesId;
+        this.seriesName = seriesName;
+        this.seriesAge = seriesAge;
+        this.seriesNumberOfEpisodes = seriesNumberOfEpisodes;
+    }
+
+    // --- Getter and Setter Methods ---
+    // These methods allow other classes to safely access and modify the private instance variables.
+
+    public String getSeriesId() {
+        return seriesId;
+    }
+
+    public void setSeriesId(String seriesId) {
+        this.seriesId = seriesId;
+    }
+
+    public String getSeriesName() {
+        return seriesName;
+    }
+
+    public void setSeriesName(String seriesName) {
+        this.seriesName = seriesName;
+    }
+
+    public String getSeriesAge() {
+        return seriesAge;
+    }
+
+    public void setSeriesAge(String seriesAge) {
+        this.seriesAge = seriesAge;
+    }
+
+    public String getSeriesNumberOfEpisodes() {
+        return seriesNumberOfEpisodes;
+    }
+
+    public void setSeriesNumberOfEpisodes(String seriesNumberOfEpisodes) {
+        this.seriesNumberOfEpisodes = seriesNumberOfEpisodes;
+    }
+
+    // This method provides a formatted string representation of the Series object.
+    // It's automatically called when you print a Series object (e.g., System.out.println(series)).
+    @Override
+    public String toString() {
+        return "Series ID: " + seriesId + 
+               "\nSeries Name: " + seriesName + 
+               "\nAge Restriction: " + seriesAge + 
+               "\nNumber of Episodes: " + seriesNumberOfEpisodes;
+    }
+}
