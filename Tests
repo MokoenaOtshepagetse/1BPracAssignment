@@ -1,0 +1,153 @@
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class MainTest {
+
+    private final InputStream systemIn = System.in;
+    private final PrintStream systemOut = System.out;
+    private ByteArrayOutputStream testOut;
+
+    @BeforeEach
+    public void setUpOutput() {
+        // Set up a stream to capture console output.
+        testOut = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(testOut));
+    }
+
+    @AfterEach
+    public void restoreSystemInputAndOutput() {
+        // Restore the original System.in and System.out streams after each test.
+        System.setIn(systemIn);
+        System.setOut(systemOut);
+    }
+    
+    // Helper method to simulate user input.
+    private void provideInput(String data) {
+        ByteArrayInputStream testIn = new ByteArrayInputStream(data.getBytes());
+        System.setIn(testIn);
+        try {
+            // Use reflection to set the private static scanner field in Main.
+            Field scannerField = Main.class.getDeclaredField("scanner");
+            scannerField.setAccessible(true);
+            scannerField.set(null, new java.util.Scanner(testIn));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // Helper method to clear the seriesList before each test.
+    private void clearSeriesList() {
+        try {
+            Field seriesListField = Main.class.getDeclaredField("seriesList");
+            seriesListField.setAccessible(true);
+            ArrayList<?> seriesList = (ArrayList<?>) seriesListField.get(null);
+            seriesList.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // --- Unit Tests ---
+
+    @Test
+    public void testSearchSeriesFound() {
+        clearSeriesList();
+        // Add a mock series to the list for testing.
+        provideInput("S001\nTest Series\n12\n100");
+        Main.captureNewSeries();
+
+        provideInput("S001");
+        Main.searchForSeries();
+        String output = testOut.toString();
+        // Assert that the output contains the series details.
+        assertTrue(output.contains("Series found! Details:"));
+        assertTrue(output.contains("Series Name: Test Series"));
+    }
+
+    @Test
+    public void testSearchSeriesNotFound() {
+        clearSeriesList();
+        provideInput("S001");
+        Main.searchForSeries();
+        String output = testOut.toString();
+        assertTrue(output.contains("Series with ID 'S001' could not be found."));
+    }
+    
+    @Test
+    public void testUpdateSeries() {
+        clearSeriesList();
+        // Add a mock series to the list.
+        provideInput("S002\nOld Name\n10\n50");
+        Main.captureNewSeries();
+
+        // Simulate input for updating the series.
+        provideInput("S002\nNew Name\n15\n75");
+        Main.updateSeriesAgeRestriction();
+        String output = testOut.toString();
+        // Assert that the output contains the new, updated details.
+        assertTrue(output.contains("Series details successfully updated!"));
+        assertTrue(output.contains("Series Name: New Name"));
+        assertTrue(output.contains("Age Restriction: 15"));
+    }
+
+    @Test
+    public void testDeleteSeriesFound() {
+        clearSeriesList();
+        // Add a mock series to be deleted.
+        provideInput("S003\nSeries to Delete\n10\n20");
+        Main.captureNewSeries();
+
+        // Simulate input for deleting the series ('y' for confirmation).
+        provideInput("S003\ny");
+        Main.deleteSeries();
+        String output = testOut.toString();
+        assertTrue(output.contains("Series successfully deleted!"));
+    }
+    
+    @Test
+    public void testDeleteSeriesNotFound() {
+        clearSeriesList();
+        // Simulate input for a non-existent ID.
+        provideInput("S004");
+        Main.deleteSeries();
+        String output = testOut.toString();
+        assertTrue(output.contains("Series with ID 'S004' could not be found. Please try again."));
+    }
+
+    @Test
+    public void testAgeRestrictionInputValid() {
+        clearSeriesList();
+        // Simulate a valid age input.
+        provideInput("S005\nAge Test\n12\n10");
+        Main.captureNewSeries();
+        String output = testOut.toString();
+        // Assert that the successful capture message is shown.
+        assertTrue(output.contains("Series successfully captured!"));
+        assertTrue(output.contains("Age Restriction: 12"));
+    }
+
+    @Test
+    public void testAgeRestrictionInputInvalidData() {
+        clearSeriesList();
+        // Simulate invalid age input followed by a valid one.
+        // The test ensures the program handles the invalid input and re-prompts.
+        provideInput("S006\nAge Test 2\n-5\n20\nabc\n15\n30");
+        Main.captureNewSeries();
+        String output = testOut.toString();
+        // Assert that the correct error messages are displayed for invalid input.
+        assertTrue(output.contains("Error: Age restriction must be between 2 and 18."));
+        assertTrue(output.contains("Error: Invalid input. Please enter a number for age restriction."));
+        // Assert that the series was successfully created with the final valid input.
+        assertTrue(output.contains("Age Restriction: 15"));
+    }
+}
