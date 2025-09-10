@@ -1,3 +1,4 @@
+package src;
 public class Series {
     // Private instance variables to store series information.
     // 'private' ensures that these variables can only be accessed within this class.
