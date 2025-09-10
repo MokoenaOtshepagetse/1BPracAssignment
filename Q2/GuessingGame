@@ -1,0 +1,29 @@
+// GuessingGame.java
+public class GuessingGame {
+    protected int minAge;
+    protected int maxAge;
+    protected int numGuesses;
+
+    public GuessingGame() {
+        this.minAge = 1;
+        this.maxAge = 120;
+        this.numGuesses = 0;
+    }
+
+    protected void incrementGuesses() {
+        numGuesses++;
+    }
+
+    public int getNumGuesses() {
+        return numGuesses;
+    }
+
+    public void adjustRange(int newMin, int newMax) {
+        this.minAge = Math.max(this.minAge, newMin);
+        this.maxAge = Math.min(this.maxAge, newMax);
+    }
+
+    public int makeGuess() {
+        return (minAge + maxAge) / 2;
+    }
+}

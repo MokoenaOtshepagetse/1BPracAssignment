@@ -1,0 +1,134 @@
+// AgeGuesser.java
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+
+public class AgeGuesser extends GuessingGame {
+
+    private ArrayList<Movie> movies;
+    private ArrayList<Movie> moviesSeen;
+    private ArrayList<Movie> moviesNotSeen;
+    private int currentYear;
+
+    public AgeGuesser() {
+        super(); // Call the parent class constructor
+        this.movies = new ArrayList<>();
+        this.moviesSeen = new ArrayList<>();
+        this.moviesNotSeen = new ArrayList<>();
+        this.currentYear = java.time.Year.now().getValue();
+        initializeMovies();
+    }
+
+    private void initializeMovies() {
+        // Add movies using the constructor
+        movies.add(new Movie("The Lion King", 1994));
+        movies.add(new Movie("Toy Story", 1995));
+        movies.add(new Movie("The Matrix", 1999));
+        movies.add(new Movie("Shrek", 2001));
+        movies.add(new Movie("Finding Nemo", 2003));
+        movies.add(new Movie("Avatar", 2009));
+        movies.add(new Movie("Frozen", 2013));
+        movies.add(new Movie("Star Wars: The Force Awakens", 2015));
+        movies.add(new Movie("Avengers: Endgame", 2019));
+    }
+
+    public void startGame() {
+        Scanner scanner = new Scanner(System.in);
+        Random random = new Random();
+        boolean ageGuessed = false;
+
+        System.out.println("Welcome to the Age Guesser!");
+        System.out.println("I'll try to guess your age based on movies you've seen.");
+        System.out.println("Type 'guess my age' at any time to have me guess immediately!");
+
+        while (!ageGuessed) {
+            if (movies.isEmpty()) {
+                System.out.println("I've run out of movies to ask about! Please try again.");
+                break;
+            }
+
+            Movie movie = movies.get(random.nextInt(movies.size()));
+            System.out.printf("\nHave you seen '%s'? (y/n or guess my age)\n", movie.getTitle());
+            String answer = scanner.nextLine().trim().toLowerCase();
+
+            if (answer.equals("guess my age")) {
+                ageGuessed = makeAGuess(scanner);
+                if (ageGuessed) {
+                    break;
+                }
+                continue; // Continue to the next question
+            }
+
+            if (answer.equals("y")) {
+                int requiredAge = currentYear - movie.getReleaseYear();
+                adjustRange(requiredAge, this.maxAge);
+                moviesSeen.add(movie);
+                movies.remove(movie);
+            } else if (answer.equals("n")) {
+                int requiredAge = currentYear - movie.getReleaseYear();
+                adjustRange(this.minAge, requiredAge - 1);
+                moviesNotSeen.add(movie);
+                movies.remove(movie);
+            } else {
+                System.out.println("Please answer 'y' or 'n'.");
+                continue;
+            }
+        }
+        scanner.close();
+    }
+
+    private boolean makeAGuess(Scanner scanner) {
+        incrementGuesses();
+        int guessedAge = makeGuess();
+        System.out.printf("\nMy guess is... are you %d years old? (y/n)\n", guessedAge);
+        String guessAnswer = scanner.nextLine().trim().toLowerCase();
+
+        if (guessAnswer.equals("y")) {
+            System.out.println("\nAwesome! I got it right!");
+            generateReport();
+            return true;
+        } else {
+            System.out.println("Too bad! Was my guess too high or too low? (high/low)");
+            String highLowAnswer = scanner.nextLine().trim().toLowerCase();
+
+            if (highLowAnswer.equals("high")) {
+                adjustRange(this.minAge, guessedAge - 1);
+            } else if (highLowAnswer.equals("low")) {
+                adjustRange(guessedAge + 1, this.maxAge);
+            } else {
+                System.out.println("Please answer 'high' or 'low'. Let's try again.");
+            }
+            if (minAge > maxAge) {
+                System.out.println("\nHmm, it seems there's a contradiction in your answers. Let's start over.");
+                return true; // End the game
+            }
+            return false;
+        }
+    }
+
+    private void generateReport() {
+        System.out.println("\n--- Report ---");
+        System.out.printf("Total Guesses: %d\n", getNumGuesses());
+        System.out.println("Movies Seen:");
+        if (moviesSeen.isEmpty()) {
+            System.out.println("  None");
+        } else {
+            for (Movie movie : moviesSeen) {
+                System.out.printf("  - %s (Released: %d)\n", movie.getTitle(), movie.getReleaseYear());
+            }
+        }
+        System.out.println("\nMovies Not Seen:");
+        if (moviesNotSeen.isEmpty()) {
+            System.out.println("  None");
+        } else {
+            for (Movie movie : moviesNotSeen) {
+                System.out.printf("  - %s (Released: %d)\n", movie.getTitle(), movie.getReleaseYear());
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        AgeGuesser game = new AgeGuesser();
+        game.startGame();
+    }
+}
