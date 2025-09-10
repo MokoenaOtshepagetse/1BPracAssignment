@@ -3,6 +3,11 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
+/**
+ * The main class for the Age Guessing game.
+ * It extends the GuessingGame class, inheriting its core logic.
+ * This class handles all user interaction and movie-specific game logic.
+ */
 public class AgeGuesser extends GuessingGame {
 
     private ArrayList<Movie> movies;
@@ -10,17 +15,25 @@ public class AgeGuesser extends GuessingGame {
     private ArrayList<Movie> moviesNotSeen;
     private int currentYear;
 
+    /**
+     * Constructor for AgeGuesser.
+     * It calls the parent constructor and initializes all the game-specific data structures.
+     */
     public AgeGuesser() {
-        super(); // Call the parent class constructor
+        super(); // Call the parent class constructor to set up minAge, maxAge, and numGuesses.
         this.movies = new ArrayList<>();
         this.moviesSeen = new ArrayList<>();
         this.moviesNotSeen = new ArrayList<>();
         this.currentYear = java.time.Year.now().getValue();
-        initializeMovies();
+        initializeMovies(); // Populate our list of movies.
     }
 
+    /**
+     * A private method to initialize the movie list.
+     * This method adds 20 new Movie objects to the ArrayList.
+     */
     private void initializeMovies() {
-        // Add movies using the constructor
+        // A mix of popular movies and famous foreign films from different eras.
         movies.add(new Movie("The Lion King", 1994));
         movies.add(new Movie("Toy Story", 1995));
         movies.add(new Movie("The Matrix", 1999));
@@ -30,53 +43,86 @@ public class AgeGuesser extends GuessingGame {
         movies.add(new Movie("Frozen", 2013));
         movies.add(new Movie("Star Wars: The Force Awakens", 2015));
         movies.add(new Movie("Avengers: Endgame", 2019));
+        movies.add(new Movie("Pulp Fiction", 1994));
+        movies.add(new Movie("Titanic", 1997));
+        movies.add(new Movie("Forrest Gump", 1994));
+        movies.add(new Movie("The Terminator", 1984));
+        movies.add(new Movie("Jurassic Park", 1993));
+        movies.add(new Movie("E.T. the Extra-Terrestrial", 1982));
+        movies.add(new Movie("Seven Samurai", 1954));
+        movies.add(new Movie("Spirited Away", 2001));
+        movies.add(new Movie("Pan's Labyrinth", 2006));
+        movies.add(new Movie("Parasite", 2019));
+        movies.add(new Movie("City of God", 2002));
+        movies.add(new Movie("The Intouchables", 2011));
+        movies.add(new Movie("Amelie", 2001));
+        movies.add(new Movie("Oldboy", 2003));
+        movies.add(new Movie("Cinema Paradiso", 1988));
+        movies.add(new Movie("Crouching Tiger, Hidden Dragon", 2000));
+        movies.add(new Movie("Life Is Beautiful", 1997));
+        movies.add(new Movie("Run Lola Run", 1998));
+        movies.add(new Movie("Train to Busan", 2016));
+        movies.add(new Movie("A Separation", 2011)); 
+        movies.add(new Movie("The Lives of Others", 2006));
     }
 
+    //The main game loop. This method handles all the user interaction, movie questions, and calls the appropriate methods based on user input.
+     
     public void startGame() {
         Scanner scanner = new Scanner(System.in);
         Random random = new Random();
         boolean ageGuessed = false;
 
         System.out.println("Welcome to the Age Guesser!");
-        System.out.println("I'll try to guess your age based on movies you've seen.");
-        System.out.println("Type 'guess my age' at any time to have me guess immediately!");
+        System.out.println("I'll try to guess your age based on movies you've seen. 🤔");
+        //System.out.println("Type 'guess my age' at any time to have me guess immediately!");
 
         while (!ageGuessed) {
             if (movies.isEmpty()) {
-                System.out.println("I've run out of movies to ask about! Please try again.");
+                System.out.println("I've run out of movies to ask about! Let's start a new game. 🎬");
+                // Option to reset or exit here. For now, we'll break.
                 break;
             }
 
+            // Pick a random movie from our list.
             Movie movie = movies.get(random.nextInt(movies.size()));
             System.out.printf("\nHave you seen '%s'? (y/n or guess my age)\n", movie.getTitle());
             String answer = scanner.nextLine().trim().toLowerCase();
 
+            // Check if the user wants an immediate guess.
             if (answer.equals("guess my age")) {
-                ageGuessed = makeAGuess(scanner);
+                // If makeAGuess returns true, the age was guessed correctly or the game should end.
+                ageGuessed = makeAGuess(scanner); 
                 if (ageGuessed) {
                     break;
                 }
-                continue; // Continue to the next question
+                continue; // Continue the loop to ask another question if the guess was wrong.
             }
 
+            // Process the 'yes' or 'no' answer.
             if (answer.equals("y")) {
                 int requiredAge = currentYear - movie.getReleaseYear();
                 adjustRange(requiredAge, this.maxAge);
                 moviesSeen.add(movie);
-                movies.remove(movie);
+                movies.remove(movie); // Remove the movie from the pool to avoid repeats.
             } else if (answer.equals("n")) {
                 int requiredAge = currentYear - movie.getReleaseYear();
                 adjustRange(this.minAge, requiredAge - 1);
                 moviesNotSeen.add(movie);
                 movies.remove(movie);
             } else {
-                System.out.println("Please answer 'y' or 'n'.");
-                continue;
+                System.out.println("Please answer 'y' or 'n'. Let's try that question again. 😅");
+                continue; // Skip the rest of the loop and re-ask the same question.
             }
         }
         scanner.close();
     }
 
+    /**
+    This method contains the logic for making a guess and handling the user's response.
+    @param scanner The Scanner object for user input.
+    @return true if the age was guessed or the game ended, false otherwise.
+     */
     private boolean makeAGuess(Scanner scanner) {
         incrementGuesses();
         int guessedAge = makeGuess();
@@ -84,7 +130,7 @@ public class AgeGuesser extends GuessingGame {
         String guessAnswer = scanner.nextLine().trim().toLowerCase();
 
         if (guessAnswer.equals("y")) {
-            System.out.println("\nAwesome! I got it right!");
+            System.out.println("\nAwesome! I got it right! 🎉");
             generateReport();
             return true;
         } else {
@@ -96,20 +142,25 @@ public class AgeGuesser extends GuessingGame {
             } else if (highLowAnswer.equals("low")) {
                 adjustRange(guessedAge + 1, this.maxAge);
             } else {
-                System.out.println("Please answer 'high' or 'low'. Let's try again.");
+                System.out.println("Please answer 'high' or 'low'. Let's try again. 😕");
             }
+            // Check for contradiction in answers.
             if (minAge > maxAge) {
-                System.out.println("\nHmm, it seems there's a contradiction in your answers. Let's start over.");
+                System.out.println("\nHmm, it seems there's a contradiction in your answers. Let's start over. 😲");
                 return true; // End the game
             }
             return false;
         }
     }
 
+    /*
+     Generates and prints the final report after the age is guessed.
+     This method demonstrates retrieving and displaying data.
+     */
     private void generateReport() {
         System.out.println("\n--- Report ---");
         System.out.printf("Total Guesses: %d\n", getNumGuesses());
-        System.out.println("Movies Seen:");
+        System.out.println("Movies Seen: ");
         if (moviesSeen.isEmpty()) {
             System.out.println("  None");
         } else {
@@ -117,7 +168,7 @@ public class AgeGuesser extends GuessingGame {
                 System.out.printf("  - %s (Released: %d)\n", movie.getTitle(), movie.getReleaseYear());
             }
         }
-        System.out.println("\nMovies Not Seen:");
+        System.out.println("\nMovies Not Seen: ");
         if (moviesNotSeen.isEmpty()) {
             System.out.println("  None");
         } else {
@@ -127,7 +178,9 @@ public class AgeGuesser extends GuessingGame {
         }
     }
 
+    //The main method and the entry point of the program.
     public static void main(String[] args) {
+        // Create a new instance of the AgeGuesser game and start it.
         AgeGuesser game = new AgeGuesser();
         game.startGame();
     }

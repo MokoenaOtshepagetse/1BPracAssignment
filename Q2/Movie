@@ -1,17 +1,37 @@
-// Movie.java
+/*
+The Movie class represents a single movie or TV series.
+It's a simple data structure to hold a movie's title and release year.
+This class demonstrates encapsulation and information hiding by using private fields.
+ */
 public class Movie {
+    // Private fields to store the movie's title and release year.
+    // They are "hidden" from outside classes and can only be accessed through public methods.
     private String title;
     private int releaseYear;
 
+    //
+     Constructor for the Movie class.
+     This is called when a new Movie object is created.
+     @param title The title of the movie.
+     @param releaseYear The year the movie was released.
+     */
     public Movie(String title, int releaseYear) {
         this.title = title;
         this.releaseYear = releaseYear;
     }
 
+    /**
+    Getter method to retrieve the movie's title.
+    @return The title of the movie.
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+    Getter method to retrieve the movie's release year.     
+    @return The release year of the movie.
+     */
     public int getReleaseYear() {
         return releaseYear;
     }

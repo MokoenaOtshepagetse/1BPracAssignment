@@ -1,28 +1,55 @@
-// GuessingGame.java
+/*
+ This is a parent class that provides the core logic for a guessing game.
+ It manages the age range and the number of guesses.
+ Other classes can inherit from this one to reuse this core functionality.
+ This demonstrates the principle of inheritance.
+ */
 public class GuessingGame {
+    // The age range for our guess. These are "protected" so that child classes can access them.
     protected int minAge;
     protected int maxAge;
+    
+    // The number of guesses made.
     protected int numGuesses;
 
+     //Constructor for the GuessingGame.
+     //Initializes the age range to a wide spectrum and sets the guess count to zero.
     public GuessingGame() {
         this.minAge = 1;
         this.maxAge = 120;
         this.numGuesses = 0;
     }
 
+    //Increments the number of guesses made.
+    //This is a simple utility method for the child class.
     protected void incrementGuesses() {
         numGuesses++;
     }
 
+    /**
+     A public getter method to safely retrieve the number of guesses.
+     @return The total number of guesses made.
+     */
     public int getNumGuesses() {
         return numGuesses;
     }
 
+    /**
+    Adjusts the current age range based on user input.
+    It ensures the new range is a valid subset of the current range.
+    @param newMin The new minimum age to consider.
+    @param newMax The new maximum age to consider.
+     */
     public void adjustRange(int newMin, int newMax) {
         this.minAge = Math.max(this.minAge, newMin);
         this.maxAge = Math.min(this.maxAge, newMax);
     }
 
+    /**
+     * Calculates the next guess by finding the midpoint of the current age range.
+     *
+     * @return The guessed age.
+     */
     public int makeGuess() {
         return (minAge + maxAge) / 2;
     }
