@@ -9,11 +9,11 @@ public class Movie {
     private String title;
     private int releaseYear;
 
-    //
+    /**
      Constructor for the Movie class.
      This is called when a new Movie object is created.
-     @param title The title of the movie.
-     @param releaseYear The year the movie was released.
+      @param title The title of the movie.
+      @param releaseYear The year the movie was released.
      */
     public Movie(String title, int releaseYear) {
         this.title = title;

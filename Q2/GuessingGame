@@ -12,8 +12,8 @@ public class GuessingGame {
     // The number of guesses made.
     protected int numGuesses;
 
-     //Constructor for the GuessingGame.
-     //Initializes the age range to a wide spectrum and sets the guess count to zero.
+    //Constructor for the GuessingGame.
+    //Initializes the age range to a wide spectrum and sets the guess count to zero.
     public GuessingGame() {
         this.minAge = 1;
         this.maxAge = 120;
@@ -27,8 +27,8 @@ public class GuessingGame {
     }
 
     /**
-     A public getter method to safely retrieve the number of guesses.
-     @return The total number of guesses made.
+    A public getter method to safely retrieve the number of guesses.
+    @return The total number of guesses made.
      */
     public int getNumGuesses() {
         return numGuesses;
@@ -46,9 +46,8 @@ public class GuessingGame {
     }
 
     /**
-     * Calculates the next guess by finding the midpoint of the current age range.
-     *
-     * @return The guessed age.
+    Calculates the next guess by finding the midpoint of the current age range.    
+    @return The guessed age.
      */
     public int makeGuess() {
         return (minAge + maxAge) / 2;
