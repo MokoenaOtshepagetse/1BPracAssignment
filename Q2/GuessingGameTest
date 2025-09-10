@@ -1,0 +1,92 @@
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+// Unit tests for the GuessingGame class.
+// This class uses JUnit 5 to test the core guessing logic.
+public class GuessingGameTest {
+
+    private GuessingGame game;
+
+    /*
+    This method runs before each test. It's used to set up a clean instance of the GuessingGame for every test case, 
+    ensuring that tests are independent and don't affect each other.
+     */
+    @BeforeEach
+    void setUp() {
+        game = new GuessingGame();
+    }
+
+    // Tests the initial state of the game.
+    // We expect the min and max age to be set correctly and the guess count to be 0.
+    @Test
+    void testInitialState() {
+        assertEquals(1, game.minAge, "Initial minAge should be 1");
+        assertEquals(120, game.maxAge, "Initial maxAge should be 120");
+        assertEquals(0, game.getNumGuesses(), "Initial number of guesses should be 0");
+    }
+
+    // Tests the makeGuess() method.
+    // With the initial range of 1-120, the first guess should be the midpoint.
+    @Test
+    void testMakeGuess() {
+        assertEquals(60, game.makeGuess(), "The first guess should be the midpoint of the initial range.");
+    }
+
+    // Tests that incrementGuesses() correctly increases the guess count.
+    @Test
+    void testIncrementGuesses() {
+        game.incrementGuesses();
+        assertEquals(1, game.getNumGuesses(), "The guess count should be 1 after one increment.");
+        game.incrementGuesses();
+        assertEquals(2, game.getNumGuesses(), "The guess count should be 2 after a second increment.");
+    }
+
+    // Tests the adjustRange() method when the user's age is higher than a movie's release year implies.
+    // For example, if a user saw a movie from 1990, their age must be at least 35 (current year 2025).
+
+    @Test
+    void testAdjustRangeHigh() {
+        // Assume current year is 2025 for testing purposes. If a movie is from 2000, required age is 25.
+        int requiredAge = 25; 
+        int newMin = requiredAge;
+        int newMax = game.maxAge;
+        game.adjustRange(newMin, newMax);
+        assertEquals(25, game.minAge, "Min age should be updated to the required age.");
+        assertEquals(120, game.maxAge, "Max age should remain unchanged.");
+    }
+    
+    // Tests the adjustRange() method when the user's age is lower than a movie's release year implies.
+    // For example, if a user has not seen a movie from 2010, their age must be less than 15 (current year 2025).
+    @Test
+    void testAdjustRangeLow() {
+        // Assume current year is 2025. If a movie is from 2010, required age is 15. User hasn't seen it, so max age is 14.
+        int requiredAge = 15;
+        int newMin = game.minAge;
+        int newMax = requiredAge - 1; 
+        game.adjustRange(newMin, newMax);
+        assertEquals(1, game.minAge, "Min age should remain unchanged.");
+        assertEquals(14, game.maxAge, "Max age should be updated to the new upper bound.");
+    }
+
+    // Tests a scenario with multiple adjustments to ensure the range correctly narrows.
+
+    @Test
+    void testMultipleAdjustments() {
+        // Assume current year is 2025
+        // First, user says 'y' to a 2000 movie (required age 25).
+        game.adjustRange(25, game.maxAge);
+        assertEquals(25, game.minAge, "After first adjustment, minAge should be 25.");
+        assertEquals(120, game.maxAge, "After first adjustment, maxAge should be 120.");
+
+        // Second, user says 'n' to a 2010 movie (required age 15).
+        // This input is contradictory for the first round, but shows how min/max change.
+        game.adjustRange(game.minAge, 14); // 2025 - 2010 - 1 = 14
+        assertEquals(25, game.minAge, "Min age should stay at 25, as 1 is lower.");
+        assertEquals(14, game.maxAge, "Max age should be 14.");
+
+        // In this case, minAge (25) > maxAge (14), which indicates a contradiction in user's input.
+        // We'll test this specific scenario.
+        assertTrue(game.minAge > game.maxAge, "The final range should be contradictory.");
+    }
+}
